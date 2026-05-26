@@ -64,7 +64,7 @@ class MyTopo(Topo):
         self.addLink(c4, s1)
         self.addLink(c5, s1)
 
-        # LINKS SERVIÇOS
+        # LINKS SERVICOS
         self.addLink(r2, s2)
         self.addLink(serverSSH, s2)
         self.addLink(serverHTTP, s2)
@@ -86,7 +86,7 @@ topo = MyTopo()
 net = Mininet(topo=topo)
 net.start()
 
-# PEGAR REFERÊNCIAS DO FIREWALL E ROTEADORES
+# PEGAR REFERENCIAS DO FIREWALL E ROTEADORES
 fw = net.get('fw')
 r1 = net.get('r1')
 r2 = net.get('r2')

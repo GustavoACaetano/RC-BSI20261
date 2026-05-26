@@ -33,6 +33,26 @@ Os seguintes recursos já estão disponíveis na VM do Mininet utilizada:
 
 Antes de executar o projeto, é necessário instalar os seguintes pacotes na VM:
 
+#### Instalar Flask
+
+Framework utilizado na construção da API Web.
+
+```bash
+sudo pip3 install flask
+```
+
+---
+
+#### Instalar PyMongo
+
+Biblioteca utilizada para comunicação entre a API Flask e o MongoDB.
+
+```bash
+sudo pip3 install pymongo
+```
+
+---
+
 #### Atualizar repositórios
 
 ```bash
@@ -55,26 +75,6 @@ Utilizado para testar requisições HTTP e operações da API.
 
 ```bash
 sudo apt install curl
-```
-
----
-
-#### Instalar Flask
-
-Framework utilizado na construção da API Web.
-
-```bash
-sudo pip3 install flask
-```
-
----
-
-#### Instalar PyMongo
-
-Biblioteca utilizada para comunicação entre a API Flask e o MongoDB.
-
-```bash
-sudo pip3 install pymongo
 ```
 
 ---

@@ -9,7 +9,6 @@ db = client.carrosdb
 
 colecao = db.carros
 
-
 @app.route('/carros', methods=['GET'])
 def listar():
     carros = []
