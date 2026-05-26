@@ -5,17 +5,6 @@ from mininet.net import Mininet
 from mininet.node import Node
 from mininet.cli import CLI
 
-# IMPORTACAO SISTEMA
-import os
-
-# PARAR serverDb DO SISTEMA
-os.system('service mongodb stop')
-os.system('systemctl disable mongodb')
-os.system('pkill -f mongod')
-os.system('sleep 2')
-# precisei fazer isso porque o serverDb do sistema estava sobrepondo o processo do serverDb criado no mininet
-# estava causando falhas de conexão e impedindo o acesso da web api ao banco 
-
 # CLASSE PARA ROTEADOR LINUX
 class LinuxRouter(Node):
     def config(self, **params):
@@ -153,7 +142,7 @@ serverSSH.cmd('/usr/sbin/sshd &')
 serverDb = net.get('serverDb')
 serverDb.cmd('rm -rf /tmp/mongo')
 serverDb.cmd('mkdir -p /tmp/mongo')
-serverDb.cmd('mongod --dbpath /tmp/mongo --bind_ip 0.0.0.0 --port 27018 --fork --logpath /tmp/mongo.log')
+serverDb.cmd('mongod --dbpath /tmp/mongo --bind_ip 0.0.0.0 --port 27017 --fork --logpath /tmp/mongo.log')
 serverDb.cmd('sleep 2')
 
 # APP

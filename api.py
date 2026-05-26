@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-client = MongoClient('192.168.79.10', 27018)
+client = MongoClient('192.168.79.10', 27017)
 
 db = client.carrosdb
 

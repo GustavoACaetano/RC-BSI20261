@@ -41,10 +41,10 @@ def configurar_firewall(fw):
     fw.cmd('iptables -A FORWARD -p tcp --sport 5000 -j ACCEPT')
 
     # Libera comunicacao entre API WEB e o banco MongoDB
-    # Porta 27018 = MONGODB
-    fw.cmd('iptables -A FORWARD -s 192.168.8.30 -d 192.168.79.10 -p tcp --dport 27018 -j ACCEPT')
+    # Porta 27017 = MONGODB
+    fw.cmd('iptables -A FORWARD -s 192.168.8.30 -d 192.168.79.10 -p tcp --dport 27017 -j ACCEPT')
     # Libera respostas do MongoDB
-    fw.cmd('iptables -A FORWARD -p tcp --sport 27018 -j ACCEPT')
+    fw.cmd('iptables -A FORWARD -p tcp --sport 27017 -j ACCEPT')
 
     # Bloueia pacotes ICMP (PING) vindos do cliente externo
     fw.cmd('iptables -A FORWARD -s 172.27.0.10 -p icmp -j DROP')
