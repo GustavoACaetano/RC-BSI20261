@@ -2,6 +2,106 @@
 
 **Discente:** Gustavo Alves Caetano
 
+## Requisitos
+
+### Ambiente Utilizado
+
+O projeto foi desenvolvido e testado utilizando a VM oficial do Mininet:
+
+- mininet-2.3.0-210211-ubuntu-20.04.1-legacy-server-amd64-ovf
+
+Disponível em:
+
+- https://github.com/mininet/mininet/releases/
+
+---
+
+### Dependências já presentes na VM
+
+Os seguintes recursos já estão disponíveis na VM do Mininet utilizada:
+
+- Python 3
+- pip3
+- OpenSSH Server
+- Mininet (`mn`)
+- net-tools
+- iptables
+
+---
+
+### Dependências necessárias para execução do projeto
+
+Antes de executar o projeto, é necessário instalar os seguintes pacotes na VM:
+
+#### Atualizar repositórios
+
+```bash
+sudo apt update
+````
+
+---
+
+#### Instalar MongoDB
+
+```bash
+sudo apt install mongodb
+```
+
+---
+
+#### Instalar Curl
+
+Utilizado para testar requisições HTTP e operações da API.
+
+```bash
+sudo apt install curl
+```
+
+---
+
+#### Instalar Flask
+
+Framework utilizado na construção da API Web.
+
+```bash
+sudo pip3 install flask
+```
+
+---
+
+#### Instalar PyMongo
+
+Biblioteca utilizada para comunicação entre a API Flask e o MongoDB.
+
+```bash
+sudo pip3 install pymongo
+```
+
+---
+
+### Organização dos Arquivos
+
+Todos os arquivos do projeto devem estar na mesma pasta:
+
+```txt
+projeto.py
+firewall.py
+api.py
+```
+
+### Execução do Projeto
+Antes de iniciar a topologia, recomenda-se limpar possíveis interfaces antigas do Mininet:
+
+```bash
+sudo mn -c
+```
+
+Em seguida, executar o projeto:
+
+```bash
+sudo python3 projeto.py
+```
+
 ---
 
 # Especificação do Projeto
