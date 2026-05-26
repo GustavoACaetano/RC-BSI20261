@@ -1,4 +1,5 @@
 # IMPORTACOES MININET
+from firewall import configurar_firewall
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.node import Node
@@ -7,12 +8,12 @@ from mininet.cli import CLI
 # IMPORTACAO SISTEMA
 import os
 
-# PARAR MONGODB DO SISTEMA
+# PARAR serverDb DO SISTEMA
 os.system('service mongodb stop')
 os.system('systemctl disable mongodb')
 os.system('pkill -f mongod')
 os.system('sleep 2')
-# precisei fazer isso porque o mongodb do sistema estava sobrepondo o processo do mongodb criado no mininet
+# precisei fazer isso porque o serverDb do sistema estava sobrepondo o processo do serverDb criado no mininet
 # estava causando falhas de conexão e impedindo o acesso da web api ao banco 
 
 # CLASSE PARA ROTEADOR LINUX
@@ -51,12 +52,15 @@ class MyTopo(Topo):
         c5 = self.addHost('c5', ip='192.168.119.14/24', defaultRoute='via 192.168.119.1')
 
         # SERVIÇOS
-        sshServer = self.addHost('sshServer', ip='192.168.8.10/24', defaultRoute='via 192.168.8.1')
-        httpServer = self.addHost('httpServer', ip='192.168.8.20/24', defaultRoute='via 192.168.8.1')
-        webapi = self.addHost('webapi', ip='192.168.8.30/24', defaultRoute='via 192.168.8.1')
+        serverSSH = self.addHost('serverSSH', ip='192.168.8.10/24', defaultRoute='via 192.168.8.1')
+        # usar o nome servidorSSH estava dando erro ao criar a interface porque o nome era muito longo
+        serverHTTP = self.addHost('serverHTTP', ip='192.168.8.20/24', defaultRoute='via 192.168.8.1')
+        # o nome servidorHTTP também dava o mesmo erro
+        app = self.addHost('app', ip='192.168.8.30/24', defaultRoute='via 192.168.8.1')
 
         # DATABASE
-        mongoDB = self.addHost('mongoDB', ip='192.168.79.10/24', defaultRoute='via 192.168.79.1')
+        serverDb = self.addHost('serverDb', ip='192.168.79.10/24', defaultRoute='via 192.168.79.1')
+        # usar o nome servidorMongoDB estava dando o mesmo erro por nome muito longo
 
         # LINKS DMZ
         self.addLink(ce, s4)
@@ -73,13 +77,13 @@ class MyTopo(Topo):
 
         # LINKS SERVIÇOS
         self.addLink(r2, s2)
-        self.addLink(sshServer, s2)
-        self.addLink(httpServer, s2)
-        self.addLink(webapi, s2)
+        self.addLink(serverSSH, s2)
+        self.addLink(serverHTTP, s2)
+        self.addLink(app, s2)
 
         # LINKS DATABASE
         self.addLink(r3, s3)
-        self.addLink(mongoDB, s3)
+        self.addLink(serverDb, s3)
 
         # LINKS ENTRE ROTEADORES
         self.addLink(r1, r2)
@@ -135,45 +139,28 @@ fw.cmd('route add -net 192.168.8.0/24 gw 192.168.119.1')
 fw.cmd('route add -net 192.168.79.0/24 gw 192.168.119.1')
 
 # FIREWALL
-fw.cmd('iptables -F')
-fw.cmd('iptables -t nat -F')
-fw.cmd('iptables -P INPUT DROP')
-fw.cmd('iptables -P FORWARD DROP')
-fw.cmd('iptables -A INPUT -i lo -j ACCEPT')
-fw.cmd('iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT')
-# LIBERAR HTTP
-fw.cmd('iptables -A FORWARD -s 172.27.0.10 -d 192.168.8.20 -p tcp --dport 80 -j ACCEPT')
-# LIBERAR SSH
-fw.cmd('iptables -A FORWARD -s 172.27.0.10 -d 192.168.8.10 -p tcp --dport 22 -j ACCEPT')
-# LIBERAR API
-fw.cmd('iptables -A FORWARD -s 172.27.0.10 -d 192.168.8.30 -p tcp --dport 5000 -j ACCEPT')
-# LIBERAR MONGODB
-fw.cmd('iptables -A FORWARD -s 192.168.8.30 -d 192.168.79.10 -p tcp --dport 27017 -j ACCEPT')
-# BLOQUEAR PING DO CLIENTE EXTERNO
-fw.cmd('iptables -A FORWARD -s 172.27.0.10 -p icmp -j DROP')
-# NAT
-fw.cmd('iptables -t nat -A POSTROUTING -o fw-eth1 -j MASQUERADE')
+configurar_firewall(fw)
 
-# HTTP SERVER
-httpServer = net.get('httpServer')
-httpServer.cmd('python3 -m http.server 80 &')
+# SERVIDOR HTTP
+serverHTTP = net.get('serverHTTP')
+serverHTTP.cmd('python3 -m http.server 80 &')
 
-# SSH SERVER
-sshServer = net.get('sshServer')
-sshServer.cmd('/usr/sbin/sshd &')
+# SERVIDOR SSH
+serverSSH = net.get('serverSSH')
+serverSSH.cmd('/usr/sbin/sshd &')
 
-# MONGODB
-mongoDB = net.get('mongoDB')
-mongoDB.cmd('rm -rf /tmp/mongo')
-mongoDB.cmd('mkdir -p /tmp/mongo')
-mongoDB.cmd('mongod --dbpath /tmp/mongo --bind_ip 0.0.0.0 --port 27018 --fork --logpath /tmp/mongo.log')
-mongoDB.cmd('sleep 2')
+# SERVIDOR MONGO DB
+serverDb = net.get('serverDb')
+serverDb.cmd('rm -rf /tmp/mongo')
+serverDb.cmd('mkdir -p /tmp/mongo')
+serverDb.cmd('mongod --dbpath /tmp/mongo --bind_ip 0.0.0.0 --port 27018 --fork --logpath /tmp/mongo.log')
+serverDb.cmd('sleep 2')
 
-# WEB API
-webapi = net.get('webapi')
-webapi.cmd('route add -net 192.168.79.0/24 gw 192.168.8.1')
-webapi.cmd('cp api.py .')
-webapi.cmd('python3 api.py &')
+# APP
+app = net.get('app')
+app.cmd('route add -net 192.168.79.0/24 gw 192.168.8.1')
+app.cmd('cp api.py .')
+app.cmd('python3 api.py &')
 
 # ABRE CLI DO MININET
 CLI(net)

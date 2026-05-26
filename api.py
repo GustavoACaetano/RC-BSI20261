@@ -20,11 +20,9 @@ def listar():
     return jsonify(carros)
 
 
-@app.route('/carros/<placa>', methods=['POST'])
-def criar(placa):
+@app.route('/carros', methods=['POST'])
+def criar():
     dados = request.json
-
-    dados['placa'] = placa
 
     colecao.insert_one(dados)
 
